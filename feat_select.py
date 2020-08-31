@@ -6,6 +6,8 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import RFE
 from sklearn.feature_selection import f_classif
 from sklearn.linear_model import LogisticRegression
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import ExtraTreesClassifier
 import os
 
@@ -44,3 +46,14 @@ model.fit(X,Y)
 importances = model.feature_importances_.tolist()
 print(f'The 3 most important features using bagged decision trees are {[x for x,y in zip(dbDF.columns.tolist()[:8], importances) if y in sorted(importances, reverse=True)[:3]]}')
 
+
+# part 4 - Lasso regularization 
+# lasso regression has embeded feature selection 
+# usually, it is a good alternative when a linear model is overfitting
+params = {'alpha':[1e-15, 1e-10, 1e-8, 1e-4, 1e-3, 1e-2, 1, 5, 10, 20]}
+lasso = Lasso()
+lasso_regressor = GridSearchCV(lasso, params, scoring='neg_mean_squared_error', cv=5)
+lasso_regressor.fit(X,Y)
+
+print(f'Lasso regularization best parameter {lasso_regressor.best_params_}')
+print(f'Lasso regularization best score {lasso_regressor.best_score_}')
